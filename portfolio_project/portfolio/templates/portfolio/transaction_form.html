@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Transaction</title>
+
+  <link rel="icon" href="/static/favicon.ico">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(13,110,253,.12), transparent),
+                  radial-gradient(900px 500px at 90% 20%, rgba(25,135,84,.12), transparent),
+                  #0b1220;
+      color: #e9eefb;
+      min-height: 100vh;
+    }
+    .glass {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+      border-radius: 18px;
+    }
+    .muted { color: rgba(233,238,251,.75); }
+    label { color: rgba(233,238,251,.85); margin-bottom: .35rem; }
+    input, select {
+      background: rgba(0,0,0,.22) !important;
+      color: #e9eefb !important;
+      border: 1px solid rgba(255,255,255,.18) !important;
+      border-radius: 12px !important;
+      padding: .6rem .75rem !important;
+    }
+    input:focus, select:focus {
+      outline: none !important;
+      border-color: rgba(13,110,253,.55) !important;
+      box-shadow: 0 0 0 .2rem rgba(13,110,253,.15) !important;
+    }
+    .helptext { color: rgba(233,238,251,.65); font-size: .9rem; }
+    .errorlist { margin: .35rem 0 0; padding-left: 1.1rem; color: #ffb4b4; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .35rem .7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+
+    .select2-container--default .select2-selection--single {
+      height: 48px !important;
+      background: rgba(0,0,0,.22) !important;
+      border: 1px solid rgba(255,255,255,.18) !important;
+      border-radius: 12px !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      color: #e9eefb !important;
+      line-height: 46px !important;
+      padding-left: 12px !important;
+    }
+
+    .select2-dropdown {
+      background: #0f172a !important;
+      color: #e9eefb !important;
+      border: 1px solid rgba(255,255,255,.18) !important;
+    }
+
+    .select2-search__field {
+      background: #111827 !important;
+      color: #e9eefb !important;
+    }
+
+    .select2-results__option {
+      color: #e9eefb !important;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+      background-color: #2563eb !important;
+      color: white !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container py-5" style="max-width: 720px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <div class="pill mb-2">
+          <span class="muted">Transaction</span>
+        </div>
+        <h2 class="fw-bold mb-0">{% if is_edit %}Edit{% else %}Add{% endif %} Transaction</h2>
+        <div class="muted">Record a BUY/SELL trade for your portfolio.</div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-light">Dashboard</a>
+        <a href="{% url 'transaction_history' %}" class="btn btn-outline-light">History</a>
+      </div>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mb-3">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="glass p-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <div class="mb-1">
+              {{ form.stock.label_tag }}
+              {{ form.stock }}
+              {{ form.stock.errors }}
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="mb-1">
+              {{ form.transaction_type.label_tag }}
+              {{ form.transaction_type }}
+              {{ form.transaction_type.errors }}
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="mb-1">
+              {{ form.quantity.label_tag }}
+              {{ form.quantity }}
+              {{ form.quantity.errors }}
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="mb-1">
+              {{ form.price.label_tag }}
+              {{ form.price }}
+              {{ form.price.errors }}
+              <div class="helptext">Enter your trade price.</div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="mb-1">
+              {{ form.transaction_date.label_tag }}
+              {{ form.transaction_date }}
+              {{ form.transaction_date.errors }}
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-primary px-4">Save</button>
+          <a href="{% url 'dashboard' %}" class="btn btn-outline-light">Cancel</a>
+        </div>
+
+        <div class="muted small mt-3">
+          Tip: After saving, go back to Dashboard to see updated holdings and value.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $('#id_stock').select2({
+        placeholder: 'Search stock...',
+        allowClear: true,
+        width: '100%'
+      });
+    });
+  </script>
+</body>
+</html>
